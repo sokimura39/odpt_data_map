@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Illustrate data from ODPT</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <!-- Maplibre -->
+    <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+
+    <!-- D3 -->
+    <script charset="utf-8" src="https://d3js.org/d3.v7.min.js"></script>
+
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="map-overlay">
+        <h2>ODPT APIの路線データの表示</h2>
+        <p>路線・駅のデータの表示テスト</p>
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+
+        // initialise map
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            center: [139.588, 35.52],
+            zoom: 12
+        });
+
+        var hoveredLineId = null;
+
+        // add line layer
+        map.on('load', function(){
+
+            // load railway data
+            d3.json('../data/edit/Railway.geojson').then(function(railway_data){
+
+                // load station data
+                d3.json('../data/edit/Station.geojson').then(function(station_data){
+
+                    // get the features
+                    var rail_features = railway_data.features;
+                    var station_features = station_data.features;
+
+                    // filter by Yokohama Municipal Subway
+                    /*
+                    rail_features = rail_features.filter((feature) => feature.properties['odpt:operator'] === 'odpt.Operator:YokohamaMunicipal');
+                    station_features = station_features.filter((feature) => feature.properties['odpt:operator'] === 'odpt.Operator:YokohamaMunicipal');
+                    */
+
+                    // add to source
+                    map.addSource('railway', {
+                        type: 'geojson',
+                        data: {
+                            'type': 'FeatureCollection',
+                            'features': rail_features
+                        }                 
+                    });
+
+                    map.addSource('stations', {
+                        type: 'geojson',
+                        data: {
+                            'type': 'FeatureCollection',
+                            'features': station_features
+                        }
+                    });
+                    
+                    // add layer
+                    map.addLayer({
+                        'id': 'railway',
+                        'type': 'line',
+                        'source': 'railway',
+                        'paint': {
+                            'line-color': '#333333',
+                            'line-opacity': 0.8,
+                            'line-width': 2,
+
+                        }
+                    });
+
+                    map.addLayer({
+                        'id': 'stations',
+                        'type': 'circle',
+                        'source': 'stations',
+                        'paint': {
+                            'circle-color': 'white',
+                            'circle-opacity': 1,
+                            'circle-stroke-width': 1,
+                            'circle-stroke-color': '#333333',
+                            'circle-radius': 7,
+                        }
+                    });
+
+                    // add popup for station
+                    var popup_station = new maplibregl.Popup({
+                        closeButton: false,
+                        closeOnClick: false,
+                        anchor: 'bottom-left',
+                        offset: 20
+                    });
+
+                    map.on('mouseover', 'stations', function(e){
+                        // change cursor
+                        map.getCanvas().style.cursor = 'pointer';
+
+                        // get data for selected station
+                        var coordinates = e.features[0].geometry.coordinates.slice();
+                        
+                        // console.log(coordinates);
+                        
+                        var station_name = e.features[0].properties.name;
+                        var operator = e.features[0].properties.operator_name;
+                        var line_name = e.features[0].properties.railway_name;
+
+                        // edit the popup
+                        var description = "<h3>【駅】" + station_name + "</h3><p>【路線】" + operator + " " + line_name + "</p>";
+                        popup_station.setLngLat(coordinates).setHTML(description).addTo(map);
+                    });
+
+                    // turn popup off on mouseleave
+                    map.on('mouseleave', 'stations', function() {
+                        map.getCanvas().style.cursor = '';
+                        popup_station.remove();
+                    });
+
+                    // add popup for rail
+                    var popup_railway = new maplibregl.Popup({
+                        closeButton: false,
+                        closeOnClick: false,
+                        anchor: 'bottom-right',
+                        offset: 20
+                    });
+
+                    map.on('mouseover', 'railway', function(e){
+                        // change cursor
+                        map.getCanvas().style.cursor = 'pointer';
+
+                        // console.log(e.features[0]);
+
+                        // get data for selected station
+                        var railway_name = e.features[0].properties.name;
+                        var operator = e.features[0].properties.operator_name;
+
+                        // edit the popup
+                        var description = "<h3>【路線】" + railway_name + "</h3><p>【事業者】" + operator + "</p>";
+                        popup_railway.setLngLat(e.lngLat).setHTML(description).addTo(map);
+
+                        // set hoverId
+                        hoveredLineId = e.features[0].properties.id;
+                        console.log(hoveredLineId);
+
+                    });
+
+                    // turn popup off on mouseleave
+                    map.on('mouseleave', 'railway', function() {
+                        map.getCanvas().style.cursor = '';
+                        popup_railway.remove();
+                        // reset hoverId
+                        hoveredLineId = null;
+                    });
+
+                });
+            });
+        });
+
+    </script>
+
+</body>
+</html>
