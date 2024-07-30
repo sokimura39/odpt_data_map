@@ -39,10 +39,10 @@
         map.on('load', function(){
 
             // load railway data
-            d3.json('https://raw.githubusercontent.com/sokimura39/odpt_data_map/main/data/edit/Railway.geojson').then(function(railway_data){
+            d3.json('data/edit/Railway.geojson').then(function(railway_data){
 
                 // load station data
-                d3.json('https://raw.githubusercontent.com/sokimura39/odpt_data_map/main/data/edit/Station.geojson').then(function(station_data){
+                d3.json('data/edit/Station.geojson').then(function(station_data){
 
                     // get the features
                     var rail_features = railway_data.features;
