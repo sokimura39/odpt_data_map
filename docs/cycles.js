@@ -1,3 +1,15 @@
+// toggle visibility
+function toggleDiv() {
+    const div = document.getElementById("overlay-content");
+    if (div.style.display === "none") {
+        div.style.display = "block";
+        document.getElementById("toggle").innerHTML = "Show";
+    } else {
+        div.style.display = "none";
+        document.getElementById("toggle").innerHTML = "Hide";
+    }
+}
+
 // define function that parses GBFS
 function fetchGBFS (source, id) {
     const data = source.data.stations.filter((station) => station.station_id === id)[0];
@@ -70,7 +82,7 @@ map.on('load', function(){
             // update time display
             const timestamp = new Date();
             const formatTime = timestamp.toLocaleString();
-            document.getElementById("timestamp").innerHTML = "Last Updated: " + formatTime;
+            document.getElementById("timestamp").innerHTML = "Data last updated: " + formatTime;
 
         }
         updateStatus();
