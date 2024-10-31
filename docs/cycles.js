@@ -33,8 +33,6 @@ function updateAvailability (source_id, status) {
     source.setData(source._data);
 }
 
-// reset selections
-
 // initialise map
 const map = new maplibregl.Map({
     container: 'map',
@@ -48,67 +46,75 @@ map.on('load', function(){
     // load data
     Promise.all([
         d3.json('data/gbfs/station_information_d.geojson'),
-        d3.json('data/gbfs/station_information_hello.geojson'),
-        d3.json('https://api-public.odpt.org/api/v4/gbfs/docomo-cycle/station_status.json'),
-        d3.json('https://api-public.odpt.org/api/v4/gbfs/hellocycling/station_status.json')
-    ]).then(function([d_docks, h_docks, d_status, h_status]){
+        d3.json('data/gbfs/station_information_hello.geojson')
+    ]).then(function([d_docks, h_docks]){
 
         // add data to source
         map.addSource('d_docks', {
             type: 'geojson',
-            data: d_docks
+            data: d_docks,
+            generateId: true
         });
         map.addSource('h_docks', {
             type: 'geojson',
-            data: h_docks
+            data: h_docks,
+            generateId: true
         });
 
         // update feature value
-        // updateAvailability('d_docks', d_status);
-        // updateAvailability('h_docks', h_status);
-        updateFromAPI('d_docks', 'https://api-public.odpt.org/api/v4/gbfs/docomo-cycle/station_status.json');
-        updateFromAPI('h_docks', 'https://api-public.odpt.org/api/v4/gbfs/hellocycling/station_status.json');
-        
+        function updateStatus() {
+            console.log('Updating Data');
+            updateFromAPI('d_docks', 'https://api-public.odpt.org/api/v4/gbfs/docomo-cycle/station_status.json');
+            updateFromAPI('h_docks', 'https://api-public.odpt.org/api/v4/gbfs/hellocycling/station_status.json');
+            
+            // update time display
+            const timestamp = new Date();
+            const formatTime = timestamp.toLocaleString();
+            document.getElementById("timestamp").innerHTML = "Last Updated: " + formatTime;
+
+        }
+        updateStatus();
+        setInterval(updateStatus, 20000);
 
         // add layer to show capacity
-        map.addLayer({
-            'id': 'd_docks',
-            'type': 'circle',
-            'source': 'd_docks',
-            'layout': {
-                'circle-sort-key': 1,
-            },
-            'paint': {
-                'circle-color': 'red',
-                'circle-opacity': 0.2,
-                'circle-radius': [
-                    'interpolate',
-                    ['linear'],
-                    ['get', 'calc_capacity'],
-                    0,0,
-                    500,200
-                ],
-            }
-        });
-        map.addLayer({
-            'id': 'h_docks',
-            'type': 'circle',
-            'source': 'h_docks',
-            'layout': {
-                'circle-sort-key': 1,
-            },
-            'paint': {
-                'circle-color': 'yellow',
-                'circle-opacity': 0.2,
-                'circle-radius': [
-                    'interpolate',
-                    ['linear'],
-                    ['get', 'calc_capacity'],
-                    0,0,
-                    500,200
-                ],
-            }
-        });
+        // map.addLayer({
+        //     'id': 'd_docks',
+        //     'type': 'circle',
+        //     'source': 'd_docks',
+        //     'layout': {
+        //         'circle-sort-key': 1,
+        //     },
+        //     'paint': {
+        //         'circle-color': 'red',
+        //         'circle-opacity': 0.2,
+        //         'circle-radius': [
+        //             'interpolate',
+        //             ['linear'],
+        //             ['get', 'calc_capacity'],
+        //             0,0,
+        //             500,200
+        //         ],
+        //     }
+        // });
+        // map.addLayer({
+        //     'id': 'h_docks',
+        //     'type': 'circle',
+        //     'source': 'h_docks',
+        //     'layout': {
+        //         'circle-sort-key': 1,
+        //     },
+        //     'paint': {
+        //         'circle-color': 'yellow',
+        //         'circle-opacity': 0.2,
+        //         'circle-radius': [
+        //             'interpolate',
+        //             ['linear'],
+        //             ['get', 'calc_capacity'],
+        //             0,0,
+        //             500,200
+        //         ],
+        //     }
+        // });
 
         // add layer to show availability
         map.addLayer({
@@ -125,8 +131,16 @@ map.on('load', function(){
                     'interpolate',
                     ['linear'],
                     ['get', 'availability'],
-                    0,0,
-                    500,200
+                    0, 2,
+                    1, 5, 
+                    500,150
+                ],
+                'circle-stroke-color': 'white',
+                'circle-stroke-width': 2,
+                'circle-stroke-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    1, 0
                 ],
             }
         });
@@ -144,8 +158,16 @@ map.on('load', function(){
                     'interpolate',
                     ['linear'],
                     ['get', 'availability'],
-                    0,0,
-                    500,200
+                    0, 2,
+                    1, 5, 
+                    500,150
+                ],
+                'circle-stroke-color': 'white',
+                'circle-stroke-width': 2,
+                'circle-stroke-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    1, 0
                 ],
             }
         });
@@ -155,15 +177,29 @@ map.on('load', function(){
             closeButton: false,
             closeOnClick: false,
             anchor: 'bottom-left',
-            offset: 20
+            offset: 5
         });
 
         map.on('mousemove', 'd_docks_availability', function(e){
             // change cursor
             map.getCanvas().style.cursor = 'pointer';
 
+            // reset selection
+            map.removeFeatureState(
+                {source: 'd_docks'},
+            );
+            map.removeFeatureState(
+                {source: 'h_docks'},
+            );
+
             // get data for selected station
             let selectedFeature = e.features[0];
+            map.setFeatureState({
+                source: 'd_docks',
+                id: e.features[0].id
+            }, {
+                'hover': true
+            });
 
             const coordinates = selectedFeature.geometry.coordinates.slice();
             
@@ -178,7 +214,7 @@ map.on('load', function(){
             const dock_availability = selectedFeature.properties.dock_availability;
 
             // edit the popup
-            var description = "<h3>" + station_name + "</h3><table><tr><td>Operator</td><td>" + "d Bike Share" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr></table>";
+            var description = "<h3>" + station_name + "</h3><table id=\"popup\"><tr><td>Operator</td><td>" + "docomo Bike Share" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr></table>";
             d_popup.setLngLat(coordinates).setHTML(description).addTo(map);
         });
 
@@ -186,11 +222,36 @@ map.on('load', function(){
         map.on('mouseleave', 'd_docks_availability', function() {
             map.getCanvas().style.cursor = '';
             d_popup.remove();
+            // reset selection
+            map.removeFeatureState(
+                {source: 'd_docks'},
+            );
+            map.removeFeatureState(
+                {source: 'h_docks'},
+            );
+            
         });
+
         map.on('mousemove', 'h_docks_availability', function(e){
             // change cursor
             map.getCanvas().style.cursor = 'pointer';
 
+            // reset selection
+            map.removeFeatureState(
+                {source: 'd_docks'},
+            );
+            map.removeFeatureState(
+                {source: 'h_docks'},
+            );
+
+            // get data for selected station
+            let selectedFeature = e.features[0];
+            map.setFeatureState({
+                source: 'h_docks',
+                id: e.features[0].id
+            }, {
+                'hover': true
+            });
             // get data for selected station
             const coordinates = e.features[0].geometry.coordinates.slice();
             
@@ -205,7 +266,7 @@ map.on('load', function(){
             const dock_availability = e.features[0].properties.dock_availability;
 
             // edit the popup
-            var description = "<h3>" + station_name + "</h3><table><tr><td>Operator</td><td>" + "HelloCycling" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr></table>";
+            var description = "<h3>" + station_name + "</h3><table id=\"popup\"><tr><td>Operator</td><td>" + "HelloCycling" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr></table>";
             d_popup.setLngLat(coordinates).setHTML(description).addTo(map);
         });
 
@@ -213,6 +274,13 @@ map.on('load', function(){
         map.on('mouseleave', 'h_docks_availability', function() {
             map.getCanvas().style.cursor = '';
             d_popup.remove();
+            // reset selection
+            map.removeFeatureState(
+                {source: 'd_docks'},
+            );
+            map.removeFeatureState(
+                {source: 'h_docks'},
+            );
         });
     });
 

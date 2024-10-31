@@ -12,12 +12,27 @@
     <!-- D3 -->
     <script charset="utf-8" src="https://d3js.org/d3.v7.min.js"></script>
 
-    <link href="style.css" rel="stylesheet">
+    <link href="style_cycle.css" rel="stylesheet">
 </head>
 <body>
     <div class="map-overlay">
         <h2>Japanese Cycle Hire Docks</h2>
-        <p>Status of Japanese cycle hire docks operated under the d Bike Share and HelloCycling schemes.</p>
+        <p>Status of Japanese cycle hire docks operated under the docomo Bike Share and HelloCycling schemes.</p>
+        <p>The radius of each circle corresponds to the number of bicycles currently available.</p>
+        <table id="legend">
+
+            <tr>
+                <td><span class="dot" id="d-dot"></span></td>
+                <td>docomo Bike Share</td>
+            </tr>
+            <tr>
+                <td><span class="dot" id="h-dot"></span></td>
+                <td>HelloCycling</td>
+            </tr>
+        </table>
+
+        <!-- Time Updated -->
+        <p id="timestamp">Loading......</p>
     </div>
 
     <div id="map"></div>
