@@ -3,10 +3,10 @@ function toggleDiv() {
     const div = document.getElementById("overlay-content");
     if (div.style.display === "none") {
         div.style.display = "block";
-        document.getElementById("toggle").innerHTML = "Show";
+        document.getElementById("toggle").innerHTML = "Hide";
     } else {
         div.style.display = "none";
-        document.getElementById("toggle").innerHTML = "Hide";
+        document.getElementById("toggle").innerHTML = "Show";
     }
 }
 
@@ -137,7 +137,7 @@ map.on('load', function(){
                 'circle-sort-key': 3,
             },
             'paint': {
-                'circle-color': 'red',
+                'circle-color': '#ff3300',
                 'circle-opacity': 0.6,
                 'circle-radius': [
                     'interpolate',
@@ -226,7 +226,7 @@ map.on('load', function(){
             const dock_availability = selectedFeature.properties.dock_availability;
 
             // edit the popup
-            var description = "<h3>" + station_name + "</h3><table id=\"popup\"><tr><td>Operator</td><td>" + "docomo Bike Share" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr></table>";
+            var description = "<h3>" + station_name + "</h3><table id=\"popup\"><tr><td>Operator</td><td>" + "docomo Bike Share" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr></table>";
             d_popup.setLngLat(coordinates).setHTML(description).addTo(map);
         });
 
@@ -278,7 +278,7 @@ map.on('load', function(){
             const dock_availability = e.features[0].properties.dock_availability;
 
             // edit the popup
-            var description = "<h3>" + station_name + "</h3><table id=\"popup\"><tr><td>Operator</td><td>" + "HelloCycling" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr></table>";
+            var description = "<h3>" + station_name + "</h3><table id=\"popup\"><tr><td>Operator</td><td>" + "HelloCycling" + "</td></tr><tr><td>Station ID</td><td>" + station_id + "</td></tr><tr><td>Bikes Available</td><td>" + availability + "</td></tr><tr><td>Docks Available</td><td>" + dock_availability + "</td></tr></table>";
             d_popup.setLngLat(coordinates).setHTML(description).addTo(map);
         });
 

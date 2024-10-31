@@ -4,13 +4,16 @@
     <meta charset="utf-8">
     <title>Cycle Hire Docks in Japan</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-
     <!-- Maplibre -->
     <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
-
     <!-- D3 -->
     <script charset="utf-8" src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 
     <link href="style_cycle.css" rel="stylesheet">
 </head>
@@ -20,7 +23,6 @@
         <div id="overlay-content">
             <h2>Cycle Hire Availability in Japan</h2>
             <p>Real-time availability of Japanese cycle hire docks operated under the docomo Bike Share and HelloCycling schemes.</p>
-            <p>The radius of each circle corresponds to the number of bicycles currently available.</p>
             <table id="legend">
                 <tr>
                     <td><span class="dot" id="d-dot"></span></td>
@@ -31,16 +33,17 @@
                     <td>HelloCycling</td>
                 </tr>
             </table>
+            <p>The radius of each circle corresponds to the number of bicycles currently available.</p>
 
             <!-- Time Updated -->
             <p id="timestamp">Loading......</p>
 
             <hr>
-            <p>Created by <a href="https://sokimura39.github.io/">Soki Kimura</a> for the <a href="https://30daymapchallenge.com/">#30DayMapChallenge</a> 2024 Day 1 - points.</p>
+            <p class="small">Created by <a href="https://sokimura39.github.io/">Soki Kimura</a> for the <a href="https://30daymapchallenge.com/">#30DayMapChallenge</a> 2024 Day 1 - points.</p>
 
-            <p>Data sourced from the <a href="https://developer.odpt.org/">ODPT API</a> operated by the Association for Open Data of Public Transportation. Visualisation purposes only.</p>
+            <p class="small">Data sourced from the <a href="https://developer.odpt.org/">ODPT API</a> operated by the Association for Open Data of Public Transportation. Visualisation purposes only.</p>
 
-            <p><a href="https://github.com/sokimura39/odpt_data_map">GitHub Repository</a></p>
+            <p class="small"><a href="https://github.com/sokimura39/odpt_data_map">GitHub Repository</a></p>
         </div>
     </div>
 
