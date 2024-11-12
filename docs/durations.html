@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>到達圏マップ</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <!-- Maplibre -->
+    <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <!-- D3 -->
+    <script charset="utf-8" src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+
+    <link href="style_cycle.css" rel="stylesheet">
+</head>
+<body>
+    <div class="map-overlay">
+
+        <button onclick="toggleDiv()" id="toggle">Hide </button>
+        <div id="overlay-content">
+            <div id="selectData">
+                <h2>到達圏マップ / Rail Duration Map</h2>
+                <p>出発駅からの鉄道を利用した際の所要時間を表示します。</p>
+                <p>Shows the duration by train (minutes) from the source station.</p>
+                <h3>出発駅指定 / Select Source Station</h3>
+                <p>駅名を入力するか、地図をクリックして起点駅を変更できます。</p>
+                <p>Type a station name (in Japanese) or click on map to update source station.</p>
+
+                <form id="sourceStationForm">
+                    起点駅 / Source: 
+                    <input type="text" id="sourceStation" value="東京">
+                    <input type="button" id="sourceStationButton" value="設定">
+                </form>
+                <hr>
+                <p class="small"><a href="https://developer.odpt.org/">公共交通オープンデータセンター</a>によるデータを基に算出。<br> Calculated using data sourced from the <a href="https://developer.odpt.org/">ODPT API</a> operated by the Association for Open Data of Public Transportation. Visualisation purposes only.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script charset="utf-8" src="durations.js"></script>
+
+    
+</body>
+
+
+</html>
