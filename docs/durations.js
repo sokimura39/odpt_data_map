@@ -67,10 +67,12 @@ map.on('load', function(){
         });
 
         let startingStationName = document.getElementById('sourceStation').value;
+        let startingStationNameEn = stationGeom.features.filter((feature) => feature.properties.station_name === startingStationName)[0].properties.station_name_en;
 
         // update starting point
         function updateStartingPoint (geomSource, startingStation) {
             startingStationName = startingStation;
+            startingStationNameEn = stationGeom.features.filter((feature) => feature.properties.station_name === startingStationName)[0].properties.station_name_en;
             const source = map.getSource(geomSource);
             const features = source._data.features;
             const distance = distanceDict[startingStation];
@@ -189,17 +191,19 @@ map.on('load', function(){
             });
             const coordinates = selectedFeature.geometry.coordinates.slice();
             const stationName = selectedFeature.properties.station_name;
+            const stationNameEn = selectedFeature.properties.station_name_en;
             const distanceMins = selectedFeature.properties.distance;
 
-            let description = '';
+            let description = "<h3>" + stationName + " / " + stationNameEn + "</h3>";
             if (distanceMins) {
-                description = "<h3>" + stationName + "</h3><p><strong>"+ startingStationName + "</strong>からの所要時間 / <br>Duration (mins): " + distanceMins + "分</p>";
+                description += "<p><strong>"+ startingStationName + "</strong>からの所要時間［分］ / <br>Duration from <strong>" + startingStationNameEn + "</strong> (mins): <strong>" + distanceMins + "</strong></p><p class=\"small\">クリックで出発駅に設定<br>Click to set as source station.</p>";
             } else {
-                description = "<h3>" + stationName + "</h3><p>No Data</p>";                
+                if (stationName === startingStationName) {
+                    description += "<p>出発駅 / Source station</p>"
+                } else {
+                    description += "<p>No Data</p>";                
+                };
             };
-
-            description += "<p class=\"small\">クリックで出発駅に設定</p>"
-
             
             stationPopup.setLngLat(coordinates).setHTML(description).addTo(map);
 
